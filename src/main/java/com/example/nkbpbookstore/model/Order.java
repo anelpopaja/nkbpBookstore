@@ -13,6 +13,7 @@ public class Order {
     @Id
     @GeneratedValue(UUIDStringGenerator.class)
     private String id;
+    private String customerId;
 
     @Property("total")
     private Double total;
@@ -51,6 +52,14 @@ public class Order {
 
     public void setBooks(List<Book> books) {
         this.books = books;
+    }
+
+    public String getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(String customerId) {
+        this.customerId = customerId;
     }
 
     @Override

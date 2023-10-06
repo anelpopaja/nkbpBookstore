@@ -1,9 +1,7 @@
 package com.example.nkbpbookstore.service;
 
 import com.example.nkbpbookstore.model.Genre;
-import com.example.nkbpbookstore.model.Customer;
 import com.example.nkbpbookstore.repository.GenreRepository;
-import com.example.nkbpbookstore.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +25,12 @@ public class GenreService {
     }
 
     @Transactional
+    public Mono<Genre> findGenreById(String id) {
+        return genreRepository.findById(id);
+    }
+
+
+    @Transactional
     public Mono<Genre> addGenre(Genre newGenre) {
         // Check if a genre with the same name already exists
         return genreRepository.findOneByName(newGenre.getName())
@@ -34,9 +38,11 @@ public class GenreService {
                 .switchIfEmpty(genreRepository.save(newGenre)); // Save new genre if not found
     }
 
-    public Mono<Void> deleteGenreByName(String name) {
-        System.out.println("hi");
-        System.out.println(name);
-        return genreRepository.deleteByName(name);
+    @Transactional
+    public Mono<Boolean> deleteGenreByName(String name) {
+        return genreRepository.findByName(name)
+                .flatMap(genre -> genreRepository.delete(genre).thenReturn(true))
+                .defaultIfEmpty(false);
     }
+
 }

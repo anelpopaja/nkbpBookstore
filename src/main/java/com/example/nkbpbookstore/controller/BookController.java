@@ -31,6 +31,11 @@ public class BookController {
         return bookService.getOneByTitle(title);
     }
 
+    @GetMapping("/author/{authorName}/{authorSurname}")
+    public Flux<Book> getBooksByAuthorNameAndSurname(@PathVariable String authorName, @PathVariable String authorSurname) {
+        return bookService.findAllByAuthorsNameAndAuthorsSurname(authorName, authorSurname);
+    }
+
     @PostMapping("/add1")
     public Void addBookWithGenresAndAuthors1(@RequestBody BookRequest bookRequest) {
         System.out.println(bookRequest);
@@ -50,13 +55,13 @@ public class BookController {
 
 
     @DeleteMapping("/delete/{title}")
-    public Mono<ResponseEntity<Void>> deleteBookByTitle(@PathVariable String title) {
+    public Mono<ResponseEntity<String>> deleteBookByTitle(@PathVariable String title) {
         return bookService.deleteBookByTitle(title)
                 .map(deleted -> {
                     if (deleted) {
-                        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+                        return ResponseEntity.ok("Book " + title + " deleted successfully.");
                     } else {
-                        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Book " + title + " not found.");
                     }
                 });
     }

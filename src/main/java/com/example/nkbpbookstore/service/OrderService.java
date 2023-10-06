@@ -37,6 +37,9 @@ public class OrderService {
         return orderRepository.findById(id);
     }
 
+    public Flux<Order> getOrdersByCustomerId(String customerId) {
+        return orderRepository.findByCustomerId(customerId);
+    }
 
 
     public Mono<Order> createOrder(OrderRequest orderRequest) {
@@ -58,6 +61,7 @@ public class OrderService {
 
                     Order order = new Order();
                     order.setBooks(books);
+                    order.setCustomerId(customerId);
 
 
                     Double total = orderRequest.getTotal();

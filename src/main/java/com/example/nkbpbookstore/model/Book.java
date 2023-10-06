@@ -33,8 +33,6 @@ public class Book {
     @Property("description")
     private String description;
 
-    // Relationships
-
 
 
     @Relationship(type = "WRITTEN_BY")

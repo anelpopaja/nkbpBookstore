@@ -28,10 +28,6 @@ public class AuthorController {
         return authorService.getAuthors();
     }
 
-    @GetMapping(value = {"", "/{name}"})
-    Mono<Author> getOneByNameAndSurname(@PathVariable String name, String surname) {
-        return authorService.getOneByNameAndSurname(name, surname);
-    }
 
     @PostMapping("/add")
     public Mono<ResponseEntity<Author>> addAuthor(@RequestBody Author newAuthor) {
@@ -40,15 +36,39 @@ public class AuthorController {
                 .defaultIfEmpty(ResponseEntity.badRequest().build());
     }
 
-    @DeleteMapping("/delete")
-    public Mono<ResponseEntity<Object>> deleteAuthorByNameAndSurname(@RequestParam String name, @RequestParam String surname) {
-        System.out.println("Got the request");
+    @GetMapping("/{name}/{surname}")
+    public Mono<Author> getAuthorByNameAndSurname(@PathVariable String name, @PathVariable String surname) {
+        return authorService.findAuthorByNameAndSurname(name, surname);
+    }
 
+    @GetMapping("/{id}")
+    public Mono<Author> getAuthorById(@PathVariable String id) {
+        return authorService.findAuthorById(id);
+    }
+
+    @DeleteMapping("/delete/{name}/{surname}")
+    public Mono<ResponseEntity<String>> deleteByNameAndSurname(@PathVariable String name, @PathVariable String surname) {
         return authorService.deleteAuthorByNameAndSurname(name, surname)
-                .then(Mono.just(ResponseEntity.ok().build()))
-                .onErrorResume(error -> Mono.just(ResponseEntity.notFound().build()));
+                .map(deleted -> {
+                    if (deleted) {
+                        return ResponseEntity.ok("Author " + name + " " + surname + " deleted successfully.");
+                    } else {
+                        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Author " + name + " " + surname + " not found.");
+                    }
+                });
+    }
 
 
+    @DeleteMapping("delete/{id}")
+    public Mono<ResponseEntity<String>> deleteAuthorById(@PathVariable String id) {
+        return authorService.deleteAuthorById(id)
+                .map(deleted -> {
+                    if (deleted) {
+                        return ResponseEntity.ok("Author with id " + id + " deleted successfully.");
+                    } else {
+                        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Author with id " + id + " not found.");
+                    }
+                });
     }
 
 }

@@ -35,7 +35,7 @@ public class BookService {
 
     @Transactional
     public Mono<Book> getOneByTitle(String title){
-        return bookRepository.findOneByTitle(title);
+        return bookRepository.findByTitle(title);
     }
 
 
@@ -45,53 +45,12 @@ public class BookService {
                 .defaultIfEmpty(false); // Return false if book wasn't found
     }
 
-
-
-    public void addBookWithGenresAndAuthors1(BookRequest bookRequest) {
-        // Check if the book already exists
-        Book existingBook = bookRepository.findOneByTitle(bookRequest.getTitle()).block();
-
-        if (existingBook != null) {
-            System.out.println("Book with title " + bookRequest.getTitle() + " already exists.");
-            return; // Exit the method if the book already exists
-        }
-
-        List<Author> authors = new ArrayList<>();
-        for (Author temp : bookRequest.getAuthors()) {
-            Author author = authorRepository.findOneByNameAndSurname(temp.getName(), temp.getSurname()).block();
-            if (author == null) {
-                author = new Author();
-                author.setName(temp.getName());
-                author.setSurname(temp.getSurname());
-                author = authorRepository.save(author).block(); // Save and get the author
-            }
-            authors.add(author);
-        }
-
-        List<Genre> genres = new ArrayList<>();
-        for (String genreName : bookRequest.getGenres()) {
-            Genre genre = genreRepository.findOneByName(genreName).block();
-            if (genre == null) {
-                genre = new Genre(genreName);
-                genre = genreRepository.save(genre).block(); // Save and get the genre
-            }
-            genres.add(genre);
-        }
-
-        Book book = new Book(
-                bookRequest.getTitle(),
-                bookRequest.getIsbn(),
-                bookRequest.getPublishingDate(),
-                bookRequest.getPrice(),
-                bookRequest.getDescription()
-        );
-        book.setAuthors(authors);
-        book.setGenres(genres);
-
-        bookRepository.save(book).block(); // Save and get the book
-
+    @Transactional
+    public Flux<Book> findAllByAuthorsNameAndAuthorsSurname(String authorName, String authorSurname) {
+        return bookRepository.findAllByAuthorsNameAndAuthorsSurname(authorName, authorSurname);
     }
 
+    @Transactional
     public Mono<Book> addBookWithGenresAndAuthors(BookRequest bookRequest) {
         // Check if the book already exists
         return bookRepository.findOneByTitle(bookRequest.getTitle())
@@ -103,7 +62,7 @@ public class BookService {
                         // If the book doesn't exist, proceed with creating it
                         Flux.fromIterable(bookRequest.getAuthors())
                                 .flatMap(temp -> {
-                                    return authorRepository.findOneByNameAndSurname(temp.getName(), temp.getSurname())
+                                    return authorRepository.findByNameAndSurname(temp.getName(), temp.getSurname())
                                             .switchIfEmpty(Mono.defer(() -> {
                                                 Author author = new Author();
                                                 author.setName(temp.getName());

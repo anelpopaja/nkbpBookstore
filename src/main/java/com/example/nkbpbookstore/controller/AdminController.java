@@ -37,7 +37,7 @@ public class AdminController {
                 .defaultIfEmpty(ResponseEntity.badRequest().build());
     }
 
-    @DeleteMapping("/{username}")
+    @DeleteMapping("delete/{username}")
     public Mono<ResponseEntity<String>> deleteAdminByUsername(@PathVariable String username) {
         return adminService.deleteAdminByUsername(username)
                 .map(deleted -> {

@@ -6,6 +6,6 @@ import reactor.core.publisher.Flux;
 
 public interface OrderRepository extends ReactiveCrudRepository<Order, String> {
 
-
+    Flux<Order> findByCustomerId(String customerId);
 
 }

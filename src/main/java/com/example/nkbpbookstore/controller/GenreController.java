@@ -34,6 +34,11 @@ public class GenreController {
         return genreService.getOneByName(name);
     }
 
+    @GetMapping("/{id}")
+    public Mono<Genre> getGenreById(@PathVariable String id) {
+        return genreService.findGenreById(id);
+    }
+
     @PostMapping("/add")
     public Mono<ResponseEntity<Genre>> addGenre(@RequestBody Genre newGenre) {
 
@@ -41,15 +46,20 @@ public class GenreController {
                 .defaultIfEmpty(ResponseEntity.badRequest().build());
     }
 
-    @DeleteMapping("/delete/{name}")
-    public Mono<ResponseEntity<Object>> deleteGenreByName(@PathVariable String name) {
-        System.out.println("Got the request");
 
+    @DeleteMapping("/delete/{name}")
+    public Mono<ResponseEntity<String>> deleteGenreByName(@PathVariable String name) {
         return genreService.deleteGenreByName(name)
-                .then(Mono.just(ResponseEntity.ok().build()))
-                .onErrorResume(error -> Mono.just(ResponseEntity.notFound().build()));
+                .map(deleted -> {
+                    if (deleted) {
+                        return ResponseEntity.ok("Genre " + name + " deleted successfully.");
+                    } else {
+                        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Genre " + name + " not found.");
+                    }
+                });
 
 
     }
+
 
 }

@@ -7,6 +7,8 @@ import org.springframework.data.neo4j.repository.query.Query;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 
 public interface BookRepository extends ReactiveNeo4jRepository<Book, String> {
     @Query("MATCH (m:Book {title: $title}) RETURN m")
@@ -16,4 +18,8 @@ public interface BookRepository extends ReactiveNeo4jRepository<Book, String> {
     Flux<Book> findAll();
 
     Mono<Void> deleteByTitle(String title);
+
+    Mono<Book> findByTitle(String title);
+
+    Flux<Book> findAllByAuthorsNameAndAuthorsSurname(String authorName, String authorSurname);
 }

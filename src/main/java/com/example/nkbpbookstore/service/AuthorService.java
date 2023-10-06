@@ -21,9 +21,13 @@ public class AuthorService {
         return authorRepository.findAll();
     }
 
-    @Transactional
-    public Mono<Author> getOneByNameAndSurname(String name, String surname){
-        return authorRepository.findOneByNameAndSurname(name, surname);
+    public Mono<Author> findAuthorByNameAndSurname(String name, String surname) {
+        return authorRepository.findByNameAndSurname(name, surname);
+    }
+
+
+    public Mono<Author> findAuthorById(String id) {
+        return authorRepository.findById(id);
     }
 
     @Transactional
@@ -31,9 +35,22 @@ public class AuthorService {
         return (authorRepository.save(author));
     }
 
-    public Mono<Void> deleteAuthorByNameAndSurname(String name, String surname) {
-        System.out.println("hi");
-        System.out.println(name + surname);
-        return authorRepository.deleteByNameAndSurname(name, surname);
+    public Mono<Boolean> deleteAuthorByNameAndSurname(String name, String surname) {
+        return authorRepository.findByNameAndSurname(name, surname)
+                .flatMap(author -> authorRepository.delete(author).thenReturn(true))
+                .defaultIfEmpty(false);
     }
+
+
+
+    @Transactional
+    public Mono<Boolean> deleteAuthorById(String id) {
+        return authorRepository.findById(id)
+                .flatMap(author -> authorRepository.delete(author).thenReturn(true))
+                .defaultIfEmpty(false);
+    }
+
+
+
+
 }

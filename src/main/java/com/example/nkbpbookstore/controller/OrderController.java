@@ -1,5 +1,6 @@
 package com.example.nkbpbookstore.controller;
 
+import com.example.nkbpbookstore.model.Genre;
 import com.example.nkbpbookstore.model.Order;
 import com.example.nkbpbookstore.model.OrderRequest;
 import com.example.nkbpbookstore.service.OrderService;
@@ -7,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -20,6 +22,11 @@ public class OrderController {
         this.orderService = orderService;
     }
 
+    @GetMapping(path = {"", "/"})
+    Flux<Order> getGenres() {
+        return orderService.getAllOrders();
+    }
+
     @PostMapping("/add")
     public Mono<ResponseEntity<Order>> addOrder(@RequestBody OrderRequest orderRequest) {
         System.out.println("Entering order controller");
@@ -28,8 +35,12 @@ public class OrderController {
                 .defaultIfEmpty(ResponseEntity.badRequest().build());
     }
 
+    @GetMapping("/customer/{customerId}")
+    public Flux<Order> getOrdersByCustomerId(@PathVariable String customerId) {
+        return orderService.getOrdersByCustomerId(customerId);
+    }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("delete/{id}")
     public Mono<ResponseEntity<String>> deleteOrderById(@PathVariable String id) {
         return orderService.deleteOrderById(id)
                 .map(deleted -> {
@@ -41,5 +52,4 @@ public class OrderController {
                 });
     }
 
-    // Add more endpoints as needed (e.g., getOrders, getOrderById, etc.)
 }

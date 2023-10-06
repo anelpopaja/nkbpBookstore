@@ -7,11 +7,14 @@ import reactor.core.publisher.Mono;
 
 public interface AuthorRepository extends ReactiveNeo4jRepository<Author, String> {
 
-    @Query("MATCH (a:Author {name: $name, surname: $surname}) RETURN a")
-    Mono<Author> findOneByNameAndSurname(String name, String surname);
+    Mono<Author> findByNameAndSurname(String name, String surname);
+
+    //Mono<Void> deleteByNameAndSurname(String name, String surname);
 
 
     @Query("MATCH (a:Author {name: $name, surname: $surname}) DELETE a")
     Mono<Void> deleteByNameAndSurname(String name, String surname);
+
+    Mono<Void> deleteById(String id);
 
 }

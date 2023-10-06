@@ -6,11 +6,12 @@ import org.springframework.data.neo4j.repository.ReactiveNeo4jRepository;
 import org.springframework.data.neo4j.repository.query.Query;
 import reactor.core.publisher.Mono;
 
+import java.util.Optional;
+
 public interface GenreRepository  extends ReactiveNeo4jRepository<Genre, String> {
     @Query("MATCH (g:Genre {name: $name}) RETURN g")
     Mono<Genre> findOneByName(String name);
 
 
-    @Query("MATCH (g:Genre {name: $name}) DELETE g")
-    Mono<Void> deleteByName(String name);
+    Mono<Genre> findByName(String name);
 }
